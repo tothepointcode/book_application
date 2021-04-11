@@ -12,6 +12,14 @@ const Book = require("./models/Book");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// mqtt
+const mqtt = require("mqtt");
+const MQTTclient = mqtt.connect("mqtt://test.mosquitto.org");
+MQTTclient.on("connect", () => {
+    console.log("Connected MQTT");
+});
+
+
 app.post("/setRecord", (req, res) => {
   const details = req.body;
   const { bookTitle, authorName } = details;
@@ -27,6 +35,17 @@ app.post("/setRecord", (req, res) => {
       res.json({
         Id: result._id,
       });
+
+      // set mqtt message
+        MQTTclient.subscribe("recordId", (err) => {
+          if (!err) {
+            MQTTclient.publish("recordId", result._id.toString());
+            console.log("MQTT Published");
+          } else {
+              console.log(err);
+          }
+        });
+
     })
     .catch((err) => {
       console.log(err);
