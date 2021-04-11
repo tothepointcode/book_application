@@ -19,6 +19,13 @@ MQTTclient.on("connect", () => {
     console.log("Connected MQTT");
 });
 
+// checking to read from client
+MQTTclient.on('message', function (topic, message) {
+    // message is Buffer
+    console.log("Message from MQTT Client");
+    console.log(topic, message.toString());
+    // MQTTclient.end();
+})
 
 app.post("/setRecord", (req, res) => {
   const details = req.body;
